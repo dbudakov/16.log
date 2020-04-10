@@ -170,3 +170,29 @@ endscript
 }
 LOGR
 ```
+Дополнительно по ротации стоит проверить запуск как запускается `logrotate` через `cron`  
+```sh
+ll /etc/cron.daily/  
+```
+### В итоге по задачам   
+критичные логи с web собираются и локально и удалённо, передача идёт по TCP, на 514 порт  
+```sh
+@web# ls -l /var/log
+@log# ls -l /var/log/web/
+```  
+логи с nginx уходят на `@log`, по UDP на 514 порт, локально пишутся `error.log`, `journalctl` и те что отдает система  
+```sh
+@web# ls -l /var/log/nginx/error.log  
+@log# ls -l /var/log/nginx/  
+```  
+
+аудит файла /etc/nginx/nginx.conf настроен и все логи аудита уходят на `@log`, по  TCP, на 60 порт   
+@log ll -l /var/log/audit/audit.log   
+
+Для локализации проблем в ходе работы испльзовались утилиты   
+```sh
+ss -ulntp                       #просмотр открытых портов
+tcpdump -i eth1 port 514 -vv    #прослушка определённого порта
+tail -f /way/to/file            #просмотр изменения файла в реальном времени
+gunzip file.gz                  #распаковка .gz архива
+```  
