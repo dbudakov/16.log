@@ -19,4 +19,40 @@
 во вторую систему все остальное  
   
 ## Решение  
-Работа выполнена в виде Vagrantfile'а [см [здесь](https://github.com/dbudakov/16.log/blob/master/homework/Vagrantfile)], который реализует по одному скрипту для настройки каждой из машин
+Работа выполнена в виде Vagrantfile'а [см [здесь](https://github.com/dbudakov/16.log/blob/master/homework/Vagrantfile)], который реализует по одному скрипту для настройки каждой из машин.
+### Настройка VM "web"
+Чистсый скрипт лежит [[здесь]](https://github.com/dbudakov/16.log/blob/master/homework/web.sh)  
+предустанавливаем nginx
+```sh
+yum install -y epel-release
+yum install -y nginx
+```
+Записываем в файл список правил для настройка rsyslog, пояснения по диррективам можно посмотреть [здесь](https://github.com/dbudakov/16.log/blob/master/source.md) пункты `1.4` и `1.5`
+```sh
+cat > web_0 <<WEB
+#LOCAL
+#*.notice       /var/log/LOCAL/notice
+#*.warn         /var/log/LOCAL/warn
+*.err           /var/log/LOCAL/err
+*.crit          /var/log/LOCAL/crit
+*.alert         /var/log/LOCAL/alert
+
+#REMOTE
+#*.*
+auth.*          @@192.168.11.102:514
+authpriv.*      @@192.168.11.102:514
+cron.*          @@192.168.11.102:514
+daemon.*        @@192.168.11.102:514
+kern.*          @@192.168.11.102:514
+#lpr.*
+#mail.*
+#mark.*
+#news.*
+#security.*
+syslog.*        @@192.168.11.102:514
+user.*          @@192.168.11.102:514
+#uucp.*
+local6.*        @@192.168.11.102:514
+local7.*        @@192.168.11.102:514
+WEB
+```
