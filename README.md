@@ -62,7 +62,8 @@ WEB
 sed -i ''$(awk '/@@remote-host:514/ {print NR}' /etc/rsyslog.conf)'r web_0'  /etc/rsyslog.conf
 systemctl restart rsyslog
 ```  
-Настраиваем централизованный сбор логов nginx  
+Настраиваем централизованный сбор логов nginx 
+справка [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) п 1.3  
 ```sh
 
 sed -i 's!/var/log/nginx/access.log!syslog:server=192.168.11.102:514,facility=local6,tag=nginx_access,severity=info!' /etc/nginx/nginx.conf
@@ -77,13 +78,14 @@ sed -i ''$(awk '/error_log/ {print NR}' /etc/nginx/nginx.conf)'r web_1'  /etc/ng
 systemctl enable nginx
 systemctl start nginx
 ```  
-Настраиваем аудит файла `/etc/nginx/nginx.conf`  
+Настраиваем аудит файла `/etc/nginx/nginx.conf`
+справка по настройке [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) п 1.8, 1.6 и 1.7
 ```sh
 cat >> /etc/audit/rules.d/audit.rules <<AUDIT
 -w /etc/nginx/nginx.conf -p wa
 AUDIT
 ```  
-Устанавливаем утилиту `audisp-remote`, входит в пакет `audispd-plugins.x86_64` для отправки логов аудита на удаленный сервер
+Устанавливаем утилиту `audisp-remote`, входит в пакет `audispd-plugins.x86_64` для отправки логов аудита на удаленную машину
 ```sh
 yum install  -y audispd-plugins.x86_64
 ```  
@@ -100,4 +102,71 @@ sed -i 's!remote_server =!remote_server = 192.168.11.102!' /etc/audisp/audisp-re
 sed -i 's!write_logs = yes!write_logs = no!' /etc/audit/auditd.conf
 systemctl daemon-reload
 service auditd restart
+```
+### Настройка VM "log"
+чистый скрипт лежит здесь [logsh](https://github.com/dbudakov/16.log/blob/master/homework/log.sh)
+Подключаем модули для принятия `UDP` и `TCP` пакетов, раскомментируя строки нужных параметров, не изменяя порт  
+```sh
+sed -i 's/#$ModLoad imudp/$ModLoad imudp/' /etc/rsyslog.conf
+sed -i 's/#$UDPServerRun/$UDPServerRun/' /etc/rsyslog.conf
+sed -i 's/#$ModLoad imtcp/$ModLoad imtcp/' /etc/rsyslog.conf
+sed -i 's/#$InputTCPServerRun/$InputTCPServerRun/' /etc/rsyslog.conf
+```  
+Создаем некий файл с правилами, фильтрации поступающих логов, 
+немного о настройке [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) пункты 1.1, 1.2 и 1.3
+```sh
+cat > log_0 <<LOG
+if \$syslogfacility-text == 'local6' and \$programname == 'nginx_access' then /var/log/web/nginx/access.log
+& ~
+if \$syslogfacility-text == 'local6' and \$programname == 'nginx_error' then /var/log/web/nginx/error.log
+& ~
+\$template RemoteLogs,"/var/log/%HOSTNAME%/%PROGRAMNAME%.log"
+*.* ?RemoteLogs
+& ~
+LOG
+```
+Вставляем список правил из созданного файла в `/etc/rsyslog.conf` и перезагружаем `rsyslog`
+```sh
+sed -i ''$(awk '/InputTCPServerRun/ {print NR}' /etc/rsyslog.conf)'r log_0'  /etc/rsyslog.conf
+sudo systemctl restart rsyslog
+```   
+Настраиваем аудит на принятие пакетов по 60 порту, на портах отличных от 60 сервис может не подняться, также перезагружаем сервис  
+```sh
+sed -i 's!##tcp_listen_port = 60!tcp_listen_port = 60!' /etc/audit/auditd.conf
+service auditd restart
+```  
+Пишем правила для ротации логов `nginx`
+справку по настройке можно посмотреть здесь [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) п 1.6, 1.7  
+```sh
+cat >/etc/logrotate.d/web.log <<LOGR
+/var/log/audit/*log
+{
+daily
+rotate 3                #максимальное кол-во ротаций, более старые ротации удаляются
+size 250M               #порог для обработки логфайла, логи менее 250М ротироваться не будут
+missingok               #не выдавать ошибку при отсутствии лог файла
+notifempty              #не обрабатывать пустые файлы
+compress                #сжимать файл ротации
+postrotate              #запуск скрипта 
+  pkill -HUP rsyslog    #обрыв связи с inode логфайлов, для создания нового логфайла, без этого логи будут лететь в туже inode, то есть в файл ротации
+endscript               #конец скрипта
+}
+LOGR
+```
+Аналогичное правило для ротации `audit.log`  
+```sh
+cat >/etc/logrotate.d/audit.log <<LOGR
+/var/log/audit/*log
+{
+daily
+rotate 3
+size 250M
+missingok
+notifempty
+compress
+postrotate
+  service auditd restart    #перезапуск сервиса для создания нового логфайла
+endscript
+}
+LOGR
 ```
