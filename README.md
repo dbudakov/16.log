@@ -63,7 +63,7 @@ sed -i ''$(awk '/@@remote-host:514/ {print NR}' /etc/rsyslog.conf)'r web_0'  /et
 systemctl restart rsyslog
 ```  
 Настраиваем централизованный сбор логов nginx 
-справка п 1.3 [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
+справка п `1.3` [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
 ```sh
 
 sed -i 's!/var/log/nginx/access.log!syslog:server=192.168.11.102:514,facility=local6,tag=nginx_access,severity=info!' /etc/nginx/nginx.conf
@@ -113,7 +113,7 @@ sed -i 's/#$ModLoad imtcp/$ModLoad imtcp/' /etc/rsyslog.conf
 sed -i 's/#$InputTCPServerRun/$InputTCPServerRun/' /etc/rsyslog.conf
 ```  
 Создаем вспомогательный файл с правилами, для фильтрации поступающих логов, 
-немного о настройке пункты 1.1, 1.2 и 1.3 [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
+немного о настройке пункты `1.1`, `1.2` и `1.3` [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
 ```sh
 cat > log_0 <<LOG
 if \$syslogfacility-text == 'local6' and \$programname == 'nginx_access' then /var/log/web/nginx/access.log
@@ -130,13 +130,13 @@ LOG
 sed -i ''$(awk '/InputTCPServerRun/ {print NR}' /etc/rsyslog.conf)'r log_0'  /etc/rsyslog.conf
 sudo systemctl restart rsyslog
 ```   
-Настраиваем аудит на принятие пакетов по 60 порту, на портах отличных от 60 сервис может не подняться, также перезагружаем сервис  
+Настраиваем аудит на принятие пакетов по `60` порту, на портах отличных от `60` сервис может не подняться, также перезагружаем сервис  
 ```sh
 sed -i 's!##tcp_listen_port = 60!tcp_listen_port = 60!' /etc/audit/auditd.conf
 service auditd restart
 ```  
 Пишем правила для ротации логов `nginx`
-справку по настройке можно посмотреть  п 1.6, 1.7  [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md)
+справку по настройке можно посмотреть  п `1.6`, `1.7`  [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md)
 ```sh
 cat >/etc/logrotate.d/web.log <<LOGR
 /var/log/audit/*log
@@ -175,18 +175,18 @@ LOGR
 ll /etc/cron.daily/  
 ```
 ### В итоге по задачам   
-критичные логи с web собираются и локально и удалённо, передача идёт по TCP, на 514 порт  
+критичные логи с web собираются и локально и удалённо, передача идёт по TCP, на `514` порт  
 ```sh
 @web# ls -l /var/log
 @log# ls -l /var/log/web/
 ```  
-логи с nginx уходят на `@log`, по UDP на 514 порт, локально пишутся `error.log`, `journalctl` и те что отдает система  
+логи с nginx уходят на `@log`, по UDP на `514` порт, локально пишутся `error.log`, `journalctl` и те что отдает система  
 ```sh
 @web# ls -l /var/log/nginx/error.log  
 @log# ls -l /var/log/nginx/  
 ```  
 
-аудит файла /etc/nginx/nginx.conf настроен и все логи аудита уходят на `@log`, по  TCP, на 60 порт   
+аудит файла /etc/nginx/nginx.conf настроен и все логи аудита уходят на `@log`, по  TCP, на `60` порт   
 @log ll -l /var/log/audit/audit.log   
 
 Для локализации проблем в ходе работы испльзовались утилиты   
