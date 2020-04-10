@@ -1,4 +1,3 @@
-###sh
 #!/bin/bash
 yum install -y epel-release
                 yum install -y  nginx
@@ -50,4 +49,4 @@ AUDIT
                 sed -i 's!write_logs = yes!write_logs = no!' /etc/audit/auditd.conf
                 systemctl daemon-reload
                 service auditd restart
-###
+
