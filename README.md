@@ -21,7 +21,7 @@
 ## Решение  
 Работа выполнена в виде Vagrantfile'а [см [здесь](https://github.com/dbudakov/16.log/blob/master/homework/Vagrantfile)], который реализует по одному скрипту для настройки каждой из машин.
 ### Настройка VM "web"
-[web.sh](https://github.com/dbudakov/16.log/blob/master/homework/web.sh)  
+[web.sh](https://github.com/dbudakov/16.log/blob/master/homework/web.sh) - чистый скрипт  
 Для начала предустанавливаем nginx
 ```sh
 yum install -y epel-release
