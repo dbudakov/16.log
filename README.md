@@ -63,7 +63,7 @@ sed -i ''$(awk '/@@remote-host:514/ {print NR}' /etc/rsyslog.conf)'r web_0'  /et
 systemctl restart rsyslog
 ```  
 Настраиваем централизованный сбор логов nginx 
-справка п `1.3` [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
+справка пункт `1.3` [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
 ```sh
 
 sed -i 's!/var/log/nginx/access.log!syslog:server=192.168.11.102:514,facility=local6,tag=nginx_access,severity=info!' /etc/nginx/nginx.conf
@@ -79,7 +79,7 @@ systemctl enable nginx
 systemctl start nginx
 ```  
 Настраиваем аудит файла `/etc/nginx/nginx.conf`
-справка по настройке п `1.8`, `1.6` и `1.7` [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
+справка по настройке пункты `1.8`, `1.6` и `1.7` [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
 ```sh
 cat >> /etc/audit/rules.d/audit.rules <<AUDIT
 -w /etc/nginx/nginx.conf -p wa
@@ -136,7 +136,7 @@ sed -i 's!##tcp_listen_port = 60!tcp_listen_port = 60!' /etc/audit/auditd.conf
 service auditd restart
 ```  
 Пишем правила для ротации логов `nginx`
-справку по настройке можно посмотреть  п `1.6`, `1.7`  [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md)
+справку по настройке можно посмотреть  пункты `1.6`, `1.7`  [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md)
 ```sh
 cat >/etc/logrotate.d/web.log <<LOGR
 /var/log/audit/*log
