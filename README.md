@@ -21,14 +21,14 @@
 ## Решение  
 Работа выполнена в виде Vagrantfile'а [см [здесь](https://github.com/dbudakov/16.log/blob/master/homework/Vagrantfile)], который реализует по одному скрипту для настройки каждой из машин.
 ### Настройка VM "web"
-Чистсый скрипт [[здесь]](https://github.com/dbudakov/16.log/blob/master/homework/web.sh)  
-предустанавливаем nginx
+[web.sh](https://github.com/dbudakov/16.log/blob/master/homework/web.sh)  
+Для начала предустанавливаем nginx
 ```sh
 yum install -y epel-release
 yum install -y nginx
 ```
-Записываем в файл список правил для настройка rsyslog,  
-справку по диррективам можно посмотреть [здесь](https://github.com/dbudakov/16.log/blob/master/source.md) пункты `1.4` и `1.5`
+Записываем в некий файл список правил для настройка rsyslog,  
+справку по диррективам можно посмотреть [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) пункты `1.4` и `1.5`
 ```sh
 cat > web_0 <<WEB
 #LOCAL
