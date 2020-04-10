@@ -67,7 +67,7 @@ systemctl restart rsyslog
 
 sed -i 's!/var/log/nginx/access.log!syslog:server=192.168.11.102:514,facility=local6,tag=nginx_access,severity=info!' /etc/nginx/nginx.conf
 ```  
-Для `error.log` используем уже знакомую комбинацию со вставкой из файла, а также добавляем веб сервис в автозагрузку и запускаем его:
+Для `error.log` используем уже знакомую комбинацию со вставкой из файла, а также добавляем `nginx` в автозагрузку и запускаем его:
 ```sh
 cat > web_1 <<WEB
 error_log syslog:server=192.168.11.102:514,facility=local6,tag=nginx_error;
@@ -77,3 +77,27 @@ sed -i ''$(awk '/error_log/ {print NR}' /etc/nginx/nginx.conf)'r web_1'  /etc/ng
 systemctl enable nginx
 systemctl start nginx
 ```  
+Настраиваем аудит файла `/etc/nginx/nginx.conf`  
+```sh
+cat >> /etc/audit/rules.d/audit.rules <<AUDIT
+-w /etc/nginx/nginx.conf -p wa
+AUDIT
+```  
+Устанавливаем утилиту `audisp-remote`, входит в пакет `audispd-plugins.x86_64` для отправки логов аудита на удаленный сервер
+```sh
+yum install  -y audispd-plugins.x86_64
+```  
+Включаем плагин для отправки логов  
+```sh
+sed -i 's!active = no!active = yes!' /etc/audisp/plugins.d/au-remote.conf
+```
+Настраиваем удалённый сервер для сбора логов
+```sh
+sed -i 's!remote_server =!remote_server = 192.168.11.102!' /etc/audisp/audisp-remote.conf
+```  
+Отключаем локальный сбор логов аудита, перезапускаем сервис  
+```sh
+sed -i 's!write_logs = yes!write_logs = no!' /etc/audit/auditd.conf
+systemctl daemon-reload
+service auditd restart
+```
