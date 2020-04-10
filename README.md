@@ -27,7 +27,7 @@
 yum install -y epel-release
 yum install -y nginx
 ```
-Записываем в некий файл список правил для настройка rsyslog,  
+Записываем во временный файл список правил для настройка rsyslog,  
 справку по диррективам можно посмотреть [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) пункты `1.4` и `1.5`
 ```sh
 cat > web_0 <<WEB
@@ -112,7 +112,7 @@ sed -i 's/#$UDPServerRun/$UDPServerRun/' /etc/rsyslog.conf
 sed -i 's/#$ModLoad imtcp/$ModLoad imtcp/' /etc/rsyslog.conf
 sed -i 's/#$InputTCPServerRun/$InputTCPServerRun/' /etc/rsyslog.conf
 ```  
-Создаем некий файл с правилами, фильтрации поступающих логов, 
+Создаем вспомогательный файл с правилами, для фильтрации поступающих логов, 
 немного о настройке [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) пункты 1.1, 1.2 и 1.3
 ```sh
 cat > log_0 <<LOG
