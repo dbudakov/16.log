@@ -28,7 +28,7 @@ yum install -y epel-release
 yum install -y nginx
 ```
 Записываем во временный файл список правил для настройка rsyslog,  
-справку по диррективам можно посмотреть [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) пункты `1.4` и `1.5`
+справку по диррективам можно посмотреть пункты `1.4` и `1.5` [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
 ```sh
 cat > web_0 <<WEB
 #LOCAL
@@ -63,7 +63,7 @@ sed -i ''$(awk '/@@remote-host:514/ {print NR}' /etc/rsyslog.conf)'r web_0'  /et
 systemctl restart rsyslog
 ```  
 Настраиваем централизованный сбор логов nginx 
-справка [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) п 1.3  
+справка п 1.3 [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
 ```sh
 
 sed -i 's!/var/log/nginx/access.log!syslog:server=192.168.11.102:514,facility=local6,tag=nginx_access,severity=info!' /etc/nginx/nginx.conf
@@ -79,7 +79,7 @@ systemctl enable nginx
 systemctl start nginx
 ```  
 Настраиваем аудит файла `/etc/nginx/nginx.conf`
-справка по настройке [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) п 1.8, 1.6 и 1.7
+справка по настройке п `1.8`, `1.6` и `1.7` [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
 ```sh
 cat >> /etc/audit/rules.d/audit.rules <<AUDIT
 -w /etc/nginx/nginx.conf -p wa
@@ -113,7 +113,7 @@ sed -i 's/#$ModLoad imtcp/$ModLoad imtcp/' /etc/rsyslog.conf
 sed -i 's/#$InputTCPServerRun/$InputTCPServerRun/' /etc/rsyslog.conf
 ```  
 Создаем вспомогательный файл с правилами, для фильтрации поступающих логов, 
-немного о настройке [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) пункты 1.1, 1.2 и 1.3
+немного о настройке пункты 1.1, 1.2 и 1.3 [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) 
 ```sh
 cat > log_0 <<LOG
 if \$syslogfacility-text == 'local6' and \$programname == 'nginx_access' then /var/log/web/nginx/access.log
@@ -136,7 +136,7 @@ sed -i 's!##tcp_listen_port = 60!tcp_listen_port = 60!' /etc/audit/auditd.conf
 service auditd restart
 ```  
 Пишем правила для ротации логов `nginx`
-справку по настройке можно посмотреть здесь [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md) п 1.6, 1.7  
+справку по настройке можно посмотреть  п 1.6, 1.7  [[здесь]](https://github.com/dbudakov/16.log/blob/master/source.md)
 ```sh
 cat >/etc/logrotate.d/web.log <<LOGR
 /var/log/audit/*log
@@ -170,7 +170,7 @@ endscript
 }
 LOGR
 ```
-Дополнительно по ротации стоит проверить запуск как запускается `logrotate` через `cron`  
+Дополнительно по ротации стоит проверить запуск, как запускается `logrotate` через `cron`  
 ```sh
 ll /etc/cron.daily/  
 ```
