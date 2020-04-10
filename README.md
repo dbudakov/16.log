@@ -32,28 +32,48 @@ yum install -y nginx
 ```sh
 cat > web_0 <<WEB
 #LOCAL
-#*.notice       /var/log/LOCAL/notice
-#*.warn         /var/log/LOCAL/warn
-*.err           /var/log/LOCAL/err
-*.crit          /var/log/LOCAL/crit
-*.alert         /var/log/LOCAL/alert
+#*.notice       /var/log/LOCAL/notice     #состояние, которое может потребовать внимания
+#*.warn         /var/log/LOCAL/warn       #предупреждение
+*.err           /var/log/LOCAL/err        #ошибка
+*.crit          /var/log/LOCAL/crit       #критическое состояние
+*.alert         /var/log/LOCAL/alert      #состояние, требующее немедленного вмешательства
 
 #REMOTE
 #*.*
-auth.*          @@192.168.11.102:514
-authpriv.*      @@192.168.11.102:514
-cron.*          @@192.168.11.102:514
-daemon.*        @@192.168.11.102:514
-kern.*          @@192.168.11.102:514
-#lpr.*
-#mail.*
-#mark.*
-#news.*
-#security.*
-syslog.*        @@192.168.11.102:514
-user.*          @@192.168.11.102:514
+auth.*          @@192.168.11.102:514      #Сообщения, поступающие от сервисов авторизации и безопасности
+authpriv.*      @@192.168.11.102:514      #aналог "auth"
+cron.*          @@192.168.11.102:514      #сообщения демона Cron
+daemon.*        @@192.168.11.102:514      #сообщения от демонов
+kern.*          @@192.168.11.102:514      #сообщения ядра Linux
+#lpr.*                                    #сообщения, связанные с печатью
+#mail.*                                   #сообщения подсистемы почты;
+#mark.*                 
+#news.*                                   #сообщения подсистемы новостей сети
+#security.*                               #аналог "auth"
+syslog.*        @@192.168.11.102:514      #системный журнал
+user.*          @@192.168.11.102:514      #сообщения пользовательских программ
 #uucp.*
-local6.*        @@192.168.11.102:514
-local7.*        @@192.168.11.102:514
+local6.*        @@192.168.11.102:514      #зарезервировано для локального использования
+local7.*        @@192.168.11.102:514      #зарезервировано для локального использования
 WEB
-```
+```  
+Вставляем содержимое созданого файла в `/etc/rsyslog.conf` и перезапускаем службу
+```sh
+sed -i ''$(awk '/@@remote-host:514/ {print NR}' /etc/rsyslog.conf)'r web_0'  /etc/rsyslog.conf
+systemctl restart rsyslog
+```  
+Настраиваем централизованный сбор логов nginx  
+```sh
+
+sed -i 's!/var/log/nginx/access.log!syslog:server=192.168.11.102:514,facility=local6,tag=nginx_access,severity=info!' /etc/nginx/nginx.conf
+```  
+Для `error.log` используем уже знакомую комбинацию со вставкой из файла, а также добавляем веб сервис в автозагрузку и запускаем его:
+```sh
+cat > web_1 <<WEB
+error_log syslog:server=192.168.11.102:514,facility=local6,tag=nginx_error;
+WEB
+sed -i ''$(awk '/error_log/ {print NR}' /etc/nginx/nginx.conf)'r web_1'  /etc/nginx/nginx.conf
+
+systemctl enable nginx
+systemctl start nginx
+```  
