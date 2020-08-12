@@ -1,4 +1,4 @@
-[](https://github.com/dbudakov/16.log/blob/master/images/16.log_white.jpg)
+![](https://github.com/dbudakov/16.log/blob/master/images/16.log_white.jpg)
 ## Домашнее задание  
 Настраиваем центральный сервер для сбора логов  
 Цель: В результате выполнения ДЗ студент настроит центральный сервер для сбора логов.  
