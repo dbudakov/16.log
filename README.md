@@ -1,5 +1,4 @@
-![](https://github.com/dbudakov/16.log/blob/master/images/16.log_white.jpg)
-## Домашнее задание  
+## Домашнее задание    
 Настраиваем центральный сервер для сбора логов  
 Цель: В результате выполнения ДЗ студент настроит центральный сервер для сбора логов.  
 в вагранте поднимаем 2 машины web и log  
@@ -20,7 +19,8 @@
 во вторую систему все остальное  
   
 ## Решение  
-Работа выполнена в виде Vagrantfile'а [см [здесь](https://github.com/dbudakov/16.log/blob/master/homework/Vagrantfile)], который реализует по одному скрипту для настройки каждой из машин.
+Работа выполнена в виде Vagrantfile'а [см [здесь](https://github.com/dbudakov/16.log/blob/master/homework/Vagrantfile)], который реализует по одному скрипту для настройки каждой из машин.  
+![](https://github.com/dbudakov/16.log/blob/master/images/16.log_white.jpg)  
 ### Настройка VM "web"
 чистый скрипт лежит здесь [web.sh](https://github.com/dbudakov/16.log/blob/master/homework/web.sh)  
 Для начала предустанавливаем nginx
