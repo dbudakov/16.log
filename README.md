@@ -199,3 +199,4 @@ gunzip file.gz                  #распаковка .gz архива
 ```  
 Дополнительно:  
 afick  
+[записи](https://github.com/dbudakov/16.log/blob/master/notes.md)  
