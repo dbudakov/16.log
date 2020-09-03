@@ -198,5 +198,6 @@ tail -f /way/to/file            #просмотр изменения файла 
 gunzip file.gz                  #распаковка .gz архива
 ```  
 Дополнительно:  
-afick  
+afick - аудит
+incron - аудит
 [записи](https://github.com/dbudakov/16.log/blob/master/notes.md)  
